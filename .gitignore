@@ -3,3 +3,5 @@ src/AuctionService/bin
 src/AuctionService/obj
 src/SearchService/bin
 src/SearchService/obj
+src/Contracts/obj
+src/Contracts/bin
