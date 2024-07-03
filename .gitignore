@@ -5,3 +5,6 @@ src/SearchService/bin
 src/SearchService/obj
 src/Contracts/obj
 src/Contracts/bin
+src/IdentityService/obj
+src/IdentityService/bin
+src/IdentityService/bin
