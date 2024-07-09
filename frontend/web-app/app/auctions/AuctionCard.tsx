@@ -2,9 +2,10 @@ import React from "react";
 import Image from "next/image";
 import CountDownTimer from "@/app/auctions/CountDownTimer";
 import CarImage from "@/app/auctions/CarImage";
+import { Auction } from "@/types";
 
 interface Props {
-  auction: any;
+  auction: Auction;
 }
 
 const AuctionCard = ({ auction }: Props) => {
