@@ -1,26 +1,59 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import AuctionCard from "@/app/auctions/AuctionCard";
 import { Auction, PageResult } from "@/types";
+import AppPagination from "@/app/components/AppPagination";
+import { getData } from "@/app/actions/auctionActions";
+import Filters from "@/app/auctions/Filters";
+import { useParamsStore } from "@/hooks/useParamsStore";
+import { shallow } from "zustand/shallow";
+import qs from "query-string";
 
-const getData = async (): Promise<PageResult<Auction>> => {
-  const res = await fetch("http://localhost:6001/search?pageSize=10");
+const Listings = () => {
+  const [data, setData] = useState<PageResult<Auction>>();
+  const params = useParamsStore(
+    (state) => ({
+      pageNumber: state.pageNumber,
+      pageSize: state.pageSize,
+      searchTerm: state.searchTerm,
+    }),
+    shallow,
+  );
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
+  const setParams = useParamsStore((state) => state.setParams);
+  const url = qs.stringifyUrl({ url: "", query: params });
+
+  const setPageNumber = (pageNumber: number) => {
+    setParams({ pageNumber });
+  };
+
+  useEffect(() => {
+    getData(url).then((data) => {
+      setData(data);
+    });
+  }, [url]);
+
+  if (!data) {
+    return <h3>Loading</h3>;
   }
 
-  return res.json();
-};
-
-const Listings = async () => {
-  const data = await getData();
   return (
-    <div className="grid grid-cols-4 gap-6">
-      {data &&
-        data.results.map((auction) => (
+    <>
+      <Filters />
+      <div className="grid grid-cols-4 gap-6">
+        {data.results.map((auction) => (
           <AuctionCard key={auction.id} auction={auction} />
         ))}
-    </div>
+      </div>
+      <div className="flex justify-center mt-4">
+        <AppPagination
+          currentPage={params.pageNumber}
+          pageCount={data.pageCount}
+          pageChanged={setPageNumber}
+        />
+      </div>
+    </>
   );
 };
 export default Listings;
