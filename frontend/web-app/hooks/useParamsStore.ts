@@ -6,6 +6,8 @@ interface State {
   pageCount: number;
   searchTerm: string;
   searchValue: string;
+  orderBy: string;
+  filterBy: string;
 }
 
 interface Actions {
@@ -20,6 +22,8 @@ const initialState: State = {
   pageCount: 1,
   searchTerm: "",
   searchValue: "",
+  orderBy: "make",
+  filterBy: "live",
 };
 
 export const useParamsStore = createWithEqualityFn<State & Actions>()(
