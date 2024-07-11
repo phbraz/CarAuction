@@ -4,8 +4,12 @@ import React, { useEffect } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Button, TextInput } from "flowbite-react";
 import Input from "@/app/components/input";
+import DateInput from "@/app/components/DateInput";
+import { createAuction } from "@/app/actions/auctionActions";
+import { useRouter } from "next/navigation";
 
 const AuctionForm = () => {
+  const router = useRouter();
   const {
     control,
     handleSubmit,
@@ -19,8 +23,16 @@ const AuctionForm = () => {
     setFocus("make");
   }, [setFocus]);
 
-  const onSubmit = (data: FieldValues) => {
-    console.log(data);
+  const onSubmit = async (data: FieldValues) => {
+    try {
+      const res = await createAuction(data);
+      if (res.error) {
+        throw res.error;
+      }
+      router.push(`/auctions/details/${res.id}`);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -57,7 +69,7 @@ const AuctionForm = () => {
           name="mileage"
           control={control}
           type="number"
-          rules={{ required: "Color is required" }}
+          rules={{ required: "Mileage is required" }}
         />
       </div>
 
@@ -76,11 +88,12 @@ const AuctionForm = () => {
           type="number"
           rules={{ required: "Reserve price is required" }}
         />
-        <Input
+        <DateInput
           label="Auction end date/time"
           name="auctionEnd"
           control={control}
-          type="date"
+          dateFormat="dd MMMM yyyy h:mm a"
+          showTimeSelect
           rules={{ required: "Auction end date is required" }}
         />
       </div>
@@ -94,6 +107,7 @@ const AuctionForm = () => {
           type="submit"
           outline
           color="success"
+          disabled={!isValid}
         >
           Submit
         </Button>

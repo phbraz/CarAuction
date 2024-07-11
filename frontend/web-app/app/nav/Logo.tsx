@@ -16,6 +16,7 @@ const Logo = () => {
       router.push("/");
       reset();
     }
+    reset();
   };
 
   return (
