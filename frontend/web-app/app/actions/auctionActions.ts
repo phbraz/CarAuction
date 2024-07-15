@@ -6,6 +6,7 @@ import { NextApiRequest } from "next";
 import { getToken } from "next-auth/jwt";
 import fetchWrapper from "@/lib/fetchWrapper";
 import { FieldValues } from "react-hook-form";
+import { revalidatePath } from "next/cache";
 
 const getTokenWorkAround = async () => {
   const req = {
@@ -39,4 +40,26 @@ const createAuction = async (data: FieldValues) => {
   return await fetchWrapper.post("auctions", data);
 };
 
-export { getTokenWorkAround, getData, updateAuctionTest, createAuction };
+const getDetailedViewData = async (id: string): Promise<Auction> => {
+  return await fetchWrapper.get(`auctions/${id}`);
+};
+
+const updateAuction = async (data: FieldValues, id: string) => {
+  const res = await fetchWrapper.put(`auctions/${id}`, data);
+  revalidatePath(`/auctions/${id}`);
+  return res;
+};
+
+const deleteAuction = async (id: string) => {
+  return await fetchWrapper.del(`auctions/${id}`);
+};
+
+export {
+  getTokenWorkAround,
+  getData,
+  updateAuctionTest,
+  createAuction,
+  getDetailedViewData,
+  updateAuction,
+  deleteAuction,
+};
