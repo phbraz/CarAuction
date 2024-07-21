@@ -1,14 +1,11 @@
 ﻿using AutoMapper;
-using BiddingService.DTOs;
-using BiddingService.Models;
-using BiddingService.Services;
 using Contracts;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Entities;
 
-namespace BiddingService.Controllers;
+namespace BiddingService;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -18,14 +15,14 @@ public class BidsController : ControllerBase
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly GrpcAuctionClient _grpcClient;
 
-    public BidsController(IMapper mapper, IPublishEndpoint publishEndpoint, GrpcAuctionClient grpcClient)
+    public BidsController(IMapper mapper, IPublishEndpoint publishEndpoint,
+        GrpcAuctionClient grpcClient)
     {
         _mapper = mapper;
         _publishEndpoint = publishEndpoint;
         _grpcClient = grpcClient;
     }
-    
-    
+
     [Authorize]
     [HttpPost]
     public async Task<ActionResult<BidDto>> PlaceBid(string auctionId, int amount)
@@ -36,10 +33,7 @@ public class BidsController : ControllerBase
         {
             auction = _grpcClient.GetAuction(auctionId);
 
-            if (auction == null)
-            {
-                return BadRequest("Cannot accept bids on this auction at this time");
-            }
+            if (auction == null) return BadRequest("Cannot accept bids on this auction at this time");
         }
 
         if (auction.Seller == User.Identity.Name)
@@ -47,7 +41,7 @@ public class BidsController : ControllerBase
             return BadRequest("You cannot bid on your own auction");
         }
 
-        var bid = new Bid()
+        var bid = new Bid
         {
             Amount = amount,
             AuctionId = auctionId,
@@ -60,19 +54,22 @@ public class BidsController : ControllerBase
         }
         else
         {
-            var highBid = await DB.Find<Bid>().Match(a => a.AuctionId == auctionId).Sort(b => b.Descending(x => x.Amount))
-                .ExecuteFirstAsync();
+            var highBid = await DB.Find<Bid>()
+                        .Match(a => a.AuctionId == auctionId)
+                        .Sort(b => b.Descending(x => x.Amount))
+                        .ExecuteFirstAsync();
 
             if (highBid != null && amount > highBid.Amount || highBid == null)
             {
-                bid.BidStatus = amount > auction.ReservePrice ? BidStatus.Accepted : BidStatus.AcceptedBelowReserve;
+                bid.BidStatus = amount > auction.ReservePrice
+                    ? BidStatus.Accepted
+                    : BidStatus.AcceptedBelowReserve;
             }
 
             if (highBid != null && bid.Amount <= highBid.Amount)
             {
                 bid.BidStatus = BidStatus.TooLow;
             }
-            
         }
 
         await DB.SaveAsync(bid);
@@ -87,7 +84,7 @@ public class BidsController : ControllerBase
     {
         var bids = await DB.Find<Bid>()
             .Match(a => a.AuctionId == auctionId)
-            .Sort(b => b.Descending(a => a.BidTime))
+            .Sort(b => b.Descending(a => a.BidDate))
             .ExecuteAsync();
 
         return bids.Select(_mapper.Map<BidDto>).ToList();

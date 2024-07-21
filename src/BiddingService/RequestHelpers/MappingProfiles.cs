@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using BiddingService.DTOs;
-using BiddingService.Models;
 using Contracts;
 
-namespace BiddingService.RequestHelpers;
+namespace BiddingService;
 
 public class MappingProfiles : Profile
 {

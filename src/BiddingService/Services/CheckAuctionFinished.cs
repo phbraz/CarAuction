@@ -1,9 +1,8 @@
-﻿using BiddingService.Models;
-using Contracts;
+﻿using Contracts;
 using MassTransit;
 using MongoDB.Entities;
 
-namespace BiddingService.Services;
+namespace BiddingService;
 
 public class CheckAuctionFinished : BackgroundService
 {
@@ -15,11 +14,10 @@ public class CheckAuctionFinished : BackgroundService
         _logger = logger;
         _services = services;
     }
-    
-    
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Starting check finished autctions");
+        _logger.LogInformation("Starting check for finished auctions");
 
         stoppingToken.Register(() => _logger.LogInformation("==> Auction check is stopping"));
 
@@ -34,15 +32,12 @@ public class CheckAuctionFinished : BackgroundService
     private async Task CheckAuctions(CancellationToken stoppingToken)
     {
         var finishedAuctions = await DB.Find<Auction>()
-            .Match(x => x.AuctionEnd < DateTime.UtcNow)
+            .Match(x => x.AuctionEnd <= DateTime.UtcNow)
             .Match(x => !x.Finished)
             .ExecuteAsync(stoppingToken);
-
-        if (finishedAuctions.Count == 0)
-        {
-            return;
-        }
         
+        if (finishedAuctions.Count == 0) return;
+
         _logger.LogInformation("==> Found {count} auctions that have completed", finishedAuctions.Count);
 
         using var scope = _services.CreateScope();
