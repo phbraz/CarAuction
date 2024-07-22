@@ -12,3 +12,5 @@ src/GatewayService/obj
 src/GatewayService/bin
 src/BiddingService/obj
 src/BiddingService/bin
+src/NotificationService/bin
+src/NotificationService/obj
