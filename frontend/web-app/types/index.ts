@@ -1,4 +1,4 @@
-export interface PageResult<T> {
+export interface PagedResult<T> {
   results: T[];
   pageCount: number;
   totalCount: number;
@@ -21,4 +21,13 @@ export interface Auction {
   reservePrice: number;
   soldAmount: number;
   currentHighBid: number;
+}
+
+export interface Bid {
+  id: string;
+  auctionId: string;
+  bidder: string;
+  bidTime: string;
+  amount: number;
+  bidStatus: string;
 }

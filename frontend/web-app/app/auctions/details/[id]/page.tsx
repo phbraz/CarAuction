@@ -1,5 +1,8 @@
 import React from "react";
-import { getDetailedViewData } from "@/app/actions/auctionActions";
+import {
+  getBidsForAuction,
+  getDetailedViewData,
+} from "@/app/actions/auctionActions";
 import Heading from "@/app/components/Heading";
 import CountDownTimer from "@/app/auctions/CountDownTimer";
 import CarImage from "@/app/auctions/CarImage";
@@ -7,6 +10,8 @@ import DetailedSpecs from "@/app/auctions/details/[id]/DetailedSpecs";
 import { getCurrentUser } from "@/app/auctions/authActions";
 import EditButton from "@/app/auctions/details/[id]/EditButton";
 import DeleteButton from "@/app/auctions/details/[id]/DeleteButton";
+import BidItem from "@/app/auctions/details/[id]/BidItem";
+import BidList from "@/app/auctions/details/[id]/BidList";
 
 const Details = async ({ params }: { params: { id: string } }) => {
   const data = await getDetailedViewData(params.id);
@@ -35,9 +40,7 @@ const Details = async ({ params }: { params: { id: string } }) => {
         <div className="w-full bg-gray-200 aspect-h-10 aspect-w-16 rounded-lg overflow-hidden">
           <CarImage imageUrl={data.imageUrl} />
         </div>
-        <div className="border-2 rounded-lg p-2 bg-gray-100">
-          <Heading title="Bids" />
-        </div>
+        <BidList user={user} auction={data} />
       </div>
 
       <div className="mt-3 grid grid-cols1 rounded-lg">

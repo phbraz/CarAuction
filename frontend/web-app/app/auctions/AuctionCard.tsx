@@ -4,6 +4,7 @@ import CountDownTimer from "@/app/auctions/CountDownTimer";
 import CarImage from "@/app/auctions/CarImage";
 import { Auction } from "@/types";
 import Link from "next/link";
+import CurrentBid from "@/app/auctions/CurrentBid";
 
 interface Props {
   auction: Auction;
@@ -17,6 +18,12 @@ const AuctionCard = ({ auction }: Props) => {
           <CarImage imageUrl={auction.imageUrl} />
           <div className="absolute bottom-2 left-2">
             <CountDownTimer auctionEnd={auction.auctionEnd} />
+          </div>
+          <div className="absolute top-2 right-2">
+            <CurrentBid
+              amount={auction.currentHighBid}
+              reservePrice={auction.reservePrice}
+            />
           </div>
         </div>
       </div>

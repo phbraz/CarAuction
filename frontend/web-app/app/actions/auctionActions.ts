@@ -1,6 +1,6 @@
 "use server";
 
-import { Auction, PageResult } from "@/types";
+import { Auction, Bid, PagedResult } from "@/types";
 import { cookies, headers } from "next/headers";
 import { NextApiRequest } from "next";
 import { getToken } from "next-auth/jwt";
@@ -21,7 +21,7 @@ const getTokenWorkAround = async () => {
   return await getToken({ req });
 };
 
-const getData = async (query: string): Promise<PageResult<Auction>> => {
+const getData = async (query: string): Promise<PagedResult<Auction>> => {
   return await fetchWrapper.get(`search${query}`);
 };
 
@@ -54,6 +54,10 @@ const deleteAuction = async (id: string) => {
   return await fetchWrapper.del(`auctions/${id}`);
 };
 
+const getBidsForAuction = async (id: string): Promise<Bid[]> => {
+  return await fetchWrapper.get(`bids/${id}`);
+};
+
 export {
   getTokenWorkAround,
   getData,
@@ -62,4 +66,5 @@ export {
   getDetailedViewData,
   updateAuction,
   deleteAuction,
+  getBidsForAuction,
 };
